@@ -33,6 +33,7 @@ const account4 = {
   pin: 4444,
 };
 
+
 const accounts = [account1, account2, account3, account4];
 
 // Elements
@@ -88,6 +89,41 @@ const username = function(accounts){
 }
 username(accounts)
 
+// --------------------------------------------------
+
+// const calcBalance = function(accounts){
+//   accounts.forEach(function(mov){
+//     const balance = mov.movements.reduce(function(acc, Ele){
+//       return acc + Ele;
+//     }, 0)
+//     labelBalance.textContent = `${balance} €`
+//   })
+// }
+// calcBalance(accounts)
+
+// ---------------------------------------------------
+
+const calcDisplayBalance = function(movements){
+  const balance = movements.reduce(function(acc, mov){
+    return acc + mov
+  }, 0);
+  labelBalance.textContent = `${balance}€`
+}
+calcDisplayBalance(account1.movements)
+
+const calcMovements = function(movements){
+  const movementIn = movements.filter(mov => mov > 0).reduce((acc, mov) => acc + mov, 0)
+  labelSumIn.textContent = `${movementIn}€`
+  
+  const movementOut = movements.filter(mov => mov < 0).reduce((acc, mov) => acc + mov, 0)
+  labelSumOut.textContent = `${Math.abs(movementOut)}€`
+
+  const interest = movements.filter(mov => mov > 0).map(mov => mov * 1.2 / 100).filter(mov => mov >= 20).reduce((acc, mov) => acc + mov, 0)
+  labelSumInterest.textContent = `${interest}€`
+  console.log(interest)
+}
+calcMovements(account1.movements)
+
 
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
@@ -99,7 +135,7 @@ username(accounts)
 //   ['GBP', 'Pound sterling'],
 // ]);
 
-// const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 /////////////////////////////////////////////////
 
@@ -127,3 +163,34 @@ username(accounts)
 //   return `Movement ${index + 1} : You ${Element > 0 ? `deposited` : `withdrawed`} ${Math.abs(Element)}`
 // }) 
 // console.log(movementDiscription)
+
+// filter method
+// const withdrawalarray = movements.filter(function(mov){
+//   return mov < 0;
+// })
+// console.log(withdrawalarray)
+
+// // reduce method
+
+// const balance = movements.reduce(function(acc, current, index, arr){
+//   console.log(acc)
+//   return acc + current;
+// }, 0)
+// console.log(balance)
+
+
+// challenge 2
+// const data1 = [10, 4, 6, 2, 8, 4]
+// const data2 = [2, 5, 3, 8, 10, 9, 20]
+// const avgHumanAge = (data) => {
+//   const avgAge = data.reduce((acc, age) => acc + age) / data.length
+//   console.log(avgAge)
+// }
+// avgHumanAge(data1)
+// avgHumanAge(data1)
+
+
+
+// console.log(movements)
+// const totalDepositRS = movements.filter(mov => mov > 0).map(mov => mov / 74).reduce((acc, mov) => acc + mov, 0)
+// console.log(totalDepositRS)
