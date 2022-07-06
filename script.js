@@ -62,6 +62,9 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
+
+// Display movements ////////////////////////
+
 const displayMovement = function(movemnets){
 
   movemnets.forEach(function(mov , index){
@@ -79,132 +82,63 @@ const displayMovement = function(movemnets){
 };
 displayMovement(account1.movements)
 
-
-const username = function(accounts){
-  accounts.forEach(function(acc){
-    const userNameMethod = acc.owner.toLowerCase().split(' ').map(function(Ele){
-      return Ele[0];}).join('')
-    console.log(userNameMethod)
-  })
+const clacDisplayBalance = function(mov){
+  const balance = mov.reduce((acc, mov) => acc + mov, 0);
+  labelBalance.textContent = balance;
 }
-username(accounts)
 
-// --------------------------------------------------
 
-// const calcBalance = function(accounts){
-//   accounts.forEach(function(mov){
-//     const balance = mov.movements.reduce(function(acc, Ele){
-//       return acc + Ele;
-//     }, 0)
-//     labelBalance.textContent = `${balance} €`
-//   })
-// }
-// calcBalance(accounts)
+const displaySummary = function(acc){
+  const incomes = acc.movements.filter(mov => mov > 0).reduce((acc, mov) => acc + mov, 0);
+  labelSumIn.textContent = incomes;
 
-// ---------------------------------------------------
+  const out = acc.movements.filter(mov => mov < 0).reduce((acc, mov) => acc + mov, 0);
+  labelSumOut.textContent = Math.abs(out)
 
-const calcDisplayBalance = function(movements){
-  const balance = movements.reduce(function(acc, mov){
-    return acc + mov
-  }, 0);
-  labelBalance.textContent = `${balance}€`
+  const interest = acc.movements.filter(mov => mov > 0).map(deposite => (deposite * acc.interestRate ) / 100).filter((int, i , arr) => {
+    return int >= 1;
+  }).reduce((acc, mov) => acc + mov , 0)
+  labelSumInterest.textContent = interest;
 }
-calcDisplayBalance(account1.movements)
 
-const calcMovements = function(movements){
-  const movementIn = movements.filter(mov => mov > 0).reduce((acc, mov) => acc + mov, 0)
-  labelSumIn.textContent = `${movementIn}€`
-  
-  const movementOut = movements.filter(mov => mov < 0).reduce((acc, mov) => acc + mov, 0)
-  labelSumOut.textContent = `${Math.abs(movementOut)}€`
 
-  const interest = movements.filter(mov => mov > 0).map(mov => mov * 1.2 / 100).filter(mov => mov >= 20).reduce((acc, mov) => acc + mov, 0)
-  labelSumInterest.textContent = `${interest}€`
-  console.log(interest)
+// username //////////////////////////////
+
+const createUsername = function(accs){
+  accs.forEach(function(acc){
+  acc.username = acc.owner.toLocaleLowerCase().split(' ').map(function(acc){
+    return acc[0];
+  }).join('')
+})
 }
-calcMovements(account1.movements)
+createUsername(accounts)
 
-
-let currentUser;
+// Implementing login
+let currentAccount;
 btnLogin.addEventListener('click', function(e){
-  e.preventDefault()
-  currentUser = accounts.find(function(acc){
-    return acc.username === inputLoginPin
-  })
-  console.log(currentUser)
-  if(currentUser?.pin === Number(inputLoginPin.value)){
-    console.log('login')
-  }
+  e.preventDefault();
+  
+  currentAccount = accounts.find(acc => acc.username === inputLoginUsername.value);
+  console.log(currentAccount)
 
+  if(currentAccount?.pin === Number(inputLoginPin.value)){
+    labelWelcome.textContent = `Welcome Back ${currentAccount.owner.split(' ')[0]}`
+    containerApp.style.opacity = 100;
+
+    // clearing field
+
+    inputLoginUsername.value = '';
+    inputLoginPin.value = '';
+
+    displayMovement(currentAccount.movements)
+    displaySummary(currentAccount.movements)
+    clacDisplayBalance(currentAccount.movements)
+    displaySummary(currentAccount)
+
+
+  }
 })
 
 
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// LECTURES
-
-// const currencies = new Map([
-//   ['USD', 'United States dollar'],
-//   ['EUR', 'Euro'],
-//   ['GBP', 'Pound sterling'],
-// ]);
-
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
-
-/////////////////////////////////////////////////
-
-// challenge 1
-// const jhon = [3, 5, 2, 12, 7]
-// const sam = [9, 16 ,6, 8, 3]
-
-// const checkDog = function(dataJhon , dataSam){
-// const jhonCopy = jhon.slice(1,3);
-// const collectedData = [...jhonCopy, ...sam];
-// collectedData.forEach(function(age, index, arr){
-//   const check = age >= 3 ? console.log(`Dog number ${index + 1} is an adult, and is ${arr.at(index)} Years old.`) : console.log(`dog number ${index + 1} is still a puppy`)
-// });
-// };
-// checkDog();
-
-// const indianRs = [2010, 5432, 6754, 7400]
-
-// const indToUSD = indianRs.map(function(Rs){
-//   return `${Rs / 74 }`
-// })
-// console.log(indToUSD)
-
-// const movementDiscription = account1.movements.map(function(Element, index){
-//   return `Movement ${index + 1} : You ${Element > 0 ? `deposited` : `withdrawed`} ${Math.abs(Element)}`
-// }) 
-// console.log(movementDiscription)
-
-// filter method
-// const withdrawalarray = movements.filter(function(mov){
-//   return mov < 0;
-// })
-// console.log(withdrawalarray)
-
-// // reduce method
-
-// const balance = movements.reduce(function(acc, current, index, arr){
-//   console.log(acc)
-//   return acc + current;
-// }, 0)
-// console.log(balance)
 
 
-// challenge 2
-// const data1 = [10, 4, 6, 2, 8, 4]
-// const data2 = [2, 5, 3, 8, 10, 9, 20]
-// const avgHumanAge = (data) => {
-//   const avgAge = data.reduce((acc, age) => acc + age) / data.length
-//   console.log(avgAge)
-// }
-// avgHumanAge(data1)
-// avgHumanAge(data1)
-
-
-
-// console.log(movements)
-// const totalDepositRS = movements.filter(mov => mov > 0).map(mov => mov / 74).reduce((acc, mov) => acc + mov, 0)
-// console.log(totalDepositRS)
