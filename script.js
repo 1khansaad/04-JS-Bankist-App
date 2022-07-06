@@ -125,6 +125,20 @@ const calcMovements = function(movements){
 calcMovements(account1.movements)
 
 
+let currentUser;
+btnLogin.addEventListener('click', function(e){
+  e.preventDefault()
+  currentUser = accounts.find(function(acc){
+    return acc.username === inputLoginPin
+  })
+  console.log(currentUser)
+  if(currentUser?.pin === Number(inputLoginPin.value)){
+    console.log('login')
+  }
+
+})
+
+
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
