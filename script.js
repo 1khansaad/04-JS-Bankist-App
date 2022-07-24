@@ -10,6 +10,16 @@ const account1 = {
   movements: [200, 450, -400, 3000, -650, -130, 70, 1300],
   interestRate: 1.2, // %
   pin: 1111,
+  movementsDates: [
+    "2019-11-18T21:31:17.178Z",
+    "2019-12-23T07:42:02.383Z",
+    "2020-01-28T09:15:04.904Z",
+    "2020-04-01T10:17:24.185Z",
+    "2020-05-08T14:11:59.604Z",
+    "2020-07-26T17:01:17.194Z",
+    "2020-07-28T23:36:17.929Z",
+    "2020-08-01T10:51:36.790Z",
+  ],
 };
 
 const account2 = {
@@ -73,10 +83,18 @@ const displayMovement = function(acc, sort = false){
   containerMovements.innerHTML = '';
   movs.forEach(function(mov , index){
     const type = mov < 0 ? 'withdrawal' : 'deposit'
+    const date = new Date(acc.movementsDates[index])
+    const day = `${date.getDate()}`.padStart(2, 0)
+    const mon = `${date.getMonth() + 1}`.padStart(2, 0)
+    const yr = date.getFullYear() 
+    
+
     const html = `
      
         <div class="movements__row">
-          <div class="movements__type movements__type--${type}">${index + 1} : ${type} deposit</div>
+          <div class="movements__type movements__type--${type}">${index + 1} : ${type}</div>
+          <div class="movements__date">${day} ${mon} ${yr}</div>
+
           <div class="movements__value">${mov}€</div>
         </div>
      `
@@ -123,8 +141,26 @@ const createUsername = function(accs){
 }
 createUsername(accounts)
 
+const now = new Date()
+const day = `${now.getDate()}`.padStart(2, 0)
+const mon = `${now.getMonth() + 1}`.padStart(2, 0)
+const yr = now.getFullYear() 
+const hr = now.getHours()
+const min = `${now.getMinutes()}`.padStart(2, 0)
+
+labelDate.textContent = `${day} \ ${mon} \ ${yr}, ${hr}:${min}`;
+
+
 // Implementing login
 let currentAccount;
+
+// fake login
+currentAccount = account1;
+updateUI(currentAccount)
+containerApp.style.opacity = 100;
+
+
+
 btnLogin.addEventListener('click', function(e){
   e.preventDefault();
   
@@ -161,6 +197,17 @@ btnTransfer.addEventListener('click', function(e){
 
 })
 
+btnLoan.addEventListener('click', function(e){
+  e.preventDefault()
+  const amount = Number(inputLoanAmount.value);
+  console.log(amount)
+  if(amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)){
+    currentAccount.movements.push(amount)
+    updateUI(currentAccount)
+  }
+  inputLoanAmount.value = '';
+})
+
 btnClose.addEventListener('click' , function(e){
   e.preventDefault();
   console.log('clicked')
@@ -174,7 +221,7 @@ btnClose.addEventListener('click' , function(e){
     containerApp.style.opacity = 0;
 
   }
-  inputTransferTo.value = inputTransferAmount.value = ''
+  inputCloseUsername.value = inputClosePin.value = '';
 })
 
 let sorted = false
@@ -183,6 +230,3 @@ btnSort.addEventListener('click', function(e){
   displayMovement(currentAccount, !sorted);
   sorted = !sorted
 })
-
-
-
