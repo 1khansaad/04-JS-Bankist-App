@@ -15,10 +15,10 @@ const account1 = {
     "2019-12-23T07:42:02.383Z",
     "2020-01-28T09:15:04.904Z",
     "2020-04-01T10:17:24.185Z",
-    "2020-05-08T14:11:59.604Z",
-    "2020-07-26T17:01:17.194Z",
-    "2020-07-28T23:36:17.929Z",
-    "2020-08-01T10:51:36.790Z",
+    "2022-07-18T14:11:59.604Z",
+    "2022-07-22T17:01:17.194Z",
+    "2022-07-23T23:36:17.929Z",
+    "2022-07-24T10:51:36.790Z",
   ],
 };
 
@@ -27,6 +27,16 @@ const account2 = {
   movements: [5000, 3400, -150, -790, -3210, -1000, 8500, -30],
   interestRate: 1.5,
   pin: 2222,
+  movementsDates: [
+    "2019-11-18T21:31:17.178Z",
+    "2019-12-23T07:42:02.383Z",
+    "2020-01-28T09:15:04.904Z",
+    "2020-04-01T10:17:24.185Z",
+    "2020-05-08T14:11:59.604Z",
+    "2020-07-26T17:01:17.194Z",
+    "2020-07-28T23:36:17.929Z",
+    "2020-08-01T10:51:36.790Z",
+  ],
 };
 
 const account3 = {
@@ -75,6 +85,31 @@ const inputClosePin = document.querySelector('.form__input--pin');
 
 // Display movements ////////////////////////
 
+const formatDate = function(date){
+
+  const clacDays = function(date1, date2){
+    return Math.round(Math.abs((date1 - date2)/(1000*60*60*24)))
+  }
+  
+  const date1 = clacDays(new Date(), date)
+  console.log(date1)
+
+  if(date1 === 0) return `Today`
+  if(date1 === 1) return `Yesterday`
+  if(date1 <= 7) return `${date1} Days a go`
+  else{
+
+  const day = `${date.getDate()}`.padStart(2, 0)
+  const mon = `${date.getMonth() + 1}`.padStart(2, 0)
+  const yr = date.getFullYear() 
+
+  return `${day} ${mon} ${yr}`
+  }
+    
+  
+    
+}
+
 
 const displayMovement = function(acc, sort = false){
 
@@ -83,17 +118,15 @@ const displayMovement = function(acc, sort = false){
   containerMovements.innerHTML = '';
   movs.forEach(function(mov , index){
     const type = mov < 0 ? 'withdrawal' : 'deposit'
+
     const date = new Date(acc.movementsDates[index])
-    const day = `${date.getDate()}`.padStart(2, 0)
-    const mon = `${date.getMonth() + 1}`.padStart(2, 0)
-    const yr = date.getFullYear() 
-    
+    const displayDate = formatDate(date)
 
     const html = `
      
         <div class="movements__row">
           <div class="movements__type movements__type--${type}">${index + 1} : ${type}</div>
-          <div class="movements__date">${day} ${mon} ${yr}</div>
+          <div class="movements__date">${displayDate}</div>
 
           <div class="movements__value">${mov}€</div>
         </div>
@@ -190,7 +223,9 @@ btnTransfer.addEventListener('click', function(e){
   inputTransferTo.value = inputTransferAmount.value = ''
   if(amount > 0 && currentAccount.balance >= amount && currentAccount.username !== receiverAcc.username && receiverAcc){
     receiverAcc.movements.push(amount)
+    receiverAcc.movementsDates.push(new Date())
     currentAccount.movements.push(-amount)
+    currentAccount.movementsDates.push(new Date())
 
     updateUI(currentAccount)
   }
@@ -203,6 +238,7 @@ btnLoan.addEventListener('click', function(e){
   console.log(amount)
   if(amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)){
     currentAccount.movements.push(amount)
+    currentAccount.movementsDates.push(new Date())
     updateUI(currentAccount)
   }
   inputLoanAmount.value = '';
