@@ -10,6 +10,7 @@ const account1 = {
   movements: [200, 450, -400, 3000, -650, -130, 70, 1300],
   interestRate: 1.2, // %
   pin: 1111,
+  locale : 'en-US',
   movementsDates: [
     "2019-11-18T21:31:17.178Z",
     "2019-12-23T07:42:02.383Z",
@@ -37,6 +38,7 @@ const account2 = {
     "2020-07-28T23:36:17.929Z",
     "2020-08-01T10:51:36.790Z",
   ],
+  locale : 'ar-SY',
 };
 
 const account3 = {
@@ -83,9 +85,9 @@ const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
 
-// Display movements ////////////////////////
 
-const formatDate = function(date){
+
+const formatDate = function(date, locale){
 
   const clacDays = function(date1, date2){
     return Math.round(Math.abs((date1 - date2)/(1000*60*60*24)))
@@ -99,17 +101,13 @@ const formatDate = function(date){
   if(date1 <= 7) return `${date1} Days a go`
   else{
 
-  const day = `${date.getDate()}`.padStart(2, 0)
-  const mon = `${date.getMonth() + 1}`.padStart(2, 0)
-  const yr = date.getFullYear() 
-
-  return `${day} ${mon} ${yr}`
+  return new Intl.DateTimeFormat(locale).format(date)
   }
     
   
     
 }
-
+// Display movements ////////////////////////
 
 const displayMovement = function(acc, sort = false){
 
@@ -120,7 +118,7 @@ const displayMovement = function(acc, sort = false){
     const type = mov < 0 ? 'withdrawal' : 'deposit'
 
     const date = new Date(acc.movementsDates[index])
-    const displayDate = formatDate(date)
+    const displayDate = formatDate(date, acc.locale)
 
     const html = `
      
@@ -157,6 +155,17 @@ const displaySummary = function(acc){
 }
 
 const updateUI = function(acc){
+  const now = new Date()
+  const options = {
+
+  day : '2-digit',
+  month : 'long',
+  year : 'numeric',
+  hour : 'numeric',
+  minute : 'numeric',
+}
+labelDate.textContent = new Intl.DateTimeFormat(currentAccount.locale, options).format(now);
+
   displayMovement(acc)
   displaySummary(acc)
   clacDisplayBalance(acc)
@@ -174,14 +183,6 @@ const createUsername = function(accs){
 }
 createUsername(accounts)
 
-const now = new Date()
-const day = `${now.getDate()}`.padStart(2, 0)
-const mon = `${now.getMonth() + 1}`.padStart(2, 0)
-const yr = now.getFullYear() 
-const hr = now.getHours()
-const min = `${now.getMinutes()}`.padStart(2, 0)
-
-labelDate.textContent = `${day} \ ${mon} \ ${yr}, ${hr}:${min}`;
 
 
 // Implementing login
@@ -212,6 +213,8 @@ btnLogin.addEventListener('click', function(e){
     updateUI(currentAccount)
   }
 })
+
+
 
 btnTransfer.addEventListener('click', function(e){
   e.preventDefault();
@@ -266,3 +269,5 @@ btnSort.addEventListener('click', function(e){
   displayMovement(currentAccount, !sorted);
   sorted = !sorted
 })
+const x = new Date()
+labelDate.textContent = new Intl.DateTimeFormat().format(x)
