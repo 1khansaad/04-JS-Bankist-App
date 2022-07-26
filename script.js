@@ -103,10 +103,7 @@ const formatDate = function(date, locale){
   else{
 
   return new Intl.DateTimeFormat(locale).format(date)
-  }
-    
-  
-    
+  } 
 }
 
 const formatCur = function(value, locale, currency){
@@ -167,15 +164,7 @@ const displaySummary = function(acc){
   labelSumInterest.textContent = formatCur(interest, acc.locale, acc.currency);
 }
 
-// setInterval(function(){
-//   const x = new Date()
-//   const options = {
-//     hour : '2-digit',
-//     minute : '2-digit',
-//     second : '2-digit'
-//   }
-//   const z = new Intl.DateTimeFormat(navigator.language, options).format(x)
-// }, 1000)
+
 
 const updateUI = function(acc){
 
@@ -192,16 +181,7 @@ const updateUI = function(acc){
     labelDate.textContent = new Intl.DateTimeFormat(navigator.language, options).format(x)
   }, 1000)
 
-//   const now = new Date()
-//   const options = {
 
-//   day : '2-digit',
-//   month : 'long',
-//   year : 'numeric',
-//   hour : 'numeric',
-//   minute : 'numeric',
-// }
-// labelDate.textContent = new Intl.DateTimeFormat(currentAccount.locale, options).format(now);
 
   displayMovement(acc)
   displaySummary(acc)
@@ -223,12 +203,36 @@ createUsername(accounts)
 
 
 // Implementing login
-let currentAccount;
+let currentAccount, timer;
 
 // fake login
-currentAccount = account1;
-updateUI(currentAccount)
-containerApp.style.opacity = 100;
+// currentAccount = account1;
+// updateUI(currentAccount)
+// containerApp.style.opacity = 100;
+
+// timer
+
+const timerLogOut = function(){
+  let time = 120
+  const tick =() => {
+    const min = String(Math.trunc(time / 60)).padStart(2, 0);
+    const sec = String(time % 60).padStart(2, 0)
+    labelTimer.textContent = `${min}:${sec}`;
+    if(time == 0){
+      clearTimeout(timeDisplay)
+      containerApp.style.opacity = 0;
+      labelWelcome.textContent = `Log in to get started`;
+      time = 10
+    }
+    time--
+  }
+  tick()
+  const timeDisplay = setInterval(tick, 1000);
+
+  return timeDisplay
+  
+}
+
 
 
 
@@ -246,8 +250,10 @@ btnLogin.addEventListener('click', function(e){
 
     inputLoginUsername.value = '';
     inputLoginPin.value = '';
-    console.log(currentAccount)
+    if(timer) clearInterval(timer)
+    timer = timerLogOut()
     updateUI(currentAccount)
+  
   }
 })
 
@@ -268,6 +274,8 @@ btnTransfer.addEventListener('click', function(e){
     currentAccount.movementsDates.push(new Date())
 
     updateUI(currentAccount)
+    clearInterval(timer)
+    timer = timerLogOut()
   }
 
 })
@@ -285,6 +293,8 @@ btnLoan.addEventListener('click', function(e){
   
   }
   inputLoanAmount.value = '';
+  clearInterval(timer)
+    timer = timerLogOut()
 })
 
 btnClose.addEventListener('click' , function(e){
