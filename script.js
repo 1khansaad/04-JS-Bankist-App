@@ -10,7 +10,7 @@ const account1 = {
   movements: [200, 450, -400, 3000, -650, -130, 70, 1300],
   interestRate: 1.2, // %
   pin: 1111,
-  locale : 'en-US',
+  locale : 'en-Uk',
   movementsDates: [
     "2019-11-18T21:31:17.178Z",
     "2019-12-23T07:42:02.383Z",
@@ -21,6 +21,7 @@ const account1 = {
     "2022-07-23T23:36:17.929Z",
     "2022-07-24T10:51:36.790Z",
   ],
+  currency : 'USD'
 };
 
 const account2 = {
@@ -38,7 +39,8 @@ const account2 = {
     "2020-07-28T23:36:17.929Z",
     "2020-08-01T10:51:36.790Z",
   ],
-  locale : 'ar-SY',
+  locale : 'hi-IN',
+  currency : 'EUR'
 };
 
 const account3 = {
@@ -94,7 +96,6 @@ const formatDate = function(date, locale){
   }
   
   const date1 = clacDays(new Date(), date)
-  console.log(date1)
 
   if(date1 === 0) return `Today`
   if(date1 === 1) return `Yesterday`
@@ -107,26 +108,37 @@ const formatDate = function(date, locale){
   
     
 }
+
+const formatCur = function(value, locale, currency){
+  const x = Math.abs(value)
+  return new Intl.NumberFormat(locale, {
+    style : 'currency',
+    currency : currency,
+  }).format(x)
+}
 // Display movements ////////////////////////
+
 
 const displayMovement = function(acc, sort = false){
 
   const movs = sort ? acc.movements.slice().sort((a, b) => a- b) : acc.movements
 
   containerMovements.innerHTML = '';
+
   movs.forEach(function(mov , index){
     const type = mov < 0 ? 'withdrawal' : 'deposit'
 
     const date = new Date(acc.movementsDates[index])
     const displayDate = formatDate(date, acc.locale)
 
+    const formatMov = formatCur(mov, acc.locale, acc.currency)
     const html = `
      
         <div class="movements__row">
           <div class="movements__type movements__type--${type}">${index + 1} : ${type}</div>
           <div class="movements__date">${displayDate}</div>
 
-          <div class="movements__value">${mov}€</div>
+          <div class="movements__value">${formatMov}</div>
         </div>
      `
 
@@ -136,35 +148,60 @@ const displayMovement = function(acc, sort = false){
 
 const clacDisplayBalance = function(acc){
   acc.balance = acc.movements.reduce((acc, mov) => acc + mov, 0);
-  labelBalance.textContent = acc.balance;
+  labelBalance.textContent = formatCur(acc.balance, acc.locale, acc.currency)
 }
 
 
 
 const displaySummary = function(acc){
   const incomes = acc.movements.filter(mov => mov > 0).reduce((acc, mov) => acc + mov, 0);
-  labelSumIn.textContent = incomes;
+  labelSumIn.textContent = formatCur(incomes, acc.locale, acc.currency);
 
   const out = acc.movements.filter(mov => mov < 0).reduce((acc, mov) => acc + mov, 0);
-  labelSumOut.textContent = Math.abs(out)
+  const x = Math.abs(out)
+  labelSumOut.textContent = (formatCur(x, acc.locale, acc.currency))
 
   const interest = acc.movements.filter(mov => mov > 0).map(deposite => (deposite * acc.interestRate ) / 100).filter((int, i , arr) => {
     return int >= 1;
   }).reduce((acc, mov) => acc + mov , 0)
-  labelSumInterest.textContent = interest;
+  labelSumInterest.textContent = formatCur(interest, acc.locale, acc.currency);
 }
+
+// setInterval(function(){
+//   const x = new Date()
+//   const options = {
+//     hour : '2-digit',
+//     minute : '2-digit',
+//     second : '2-digit'
+//   }
+//   const z = new Intl.DateTimeFormat(navigator.language, options).format(x)
+// }, 1000)
 
 const updateUI = function(acc){
-  const now = new Date()
-  const options = {
 
-  day : '2-digit',
-  month : 'long',
-  year : 'numeric',
-  hour : 'numeric',
-  minute : 'numeric',
-}
-labelDate.textContent = new Intl.DateTimeFormat(currentAccount.locale, options).format(now);
+  setInterval(function(){
+    const x = new Date()
+    const options = {
+      day : '2-digit',
+      month : 'long',
+      year : 'numeric',
+      hour : '2-digit',
+      minute : '2-digit',
+      second : '2-digit'
+    }
+    labelDate.textContent = new Intl.DateTimeFormat(navigator.language, options).format(x)
+  }, 1000)
+
+//   const now = new Date()
+//   const options = {
+
+//   day : '2-digit',
+//   month : 'long',
+//   year : 'numeric',
+//   hour : 'numeric',
+//   minute : 'numeric',
+// }
+// labelDate.textContent = new Intl.DateTimeFormat(currentAccount.locale, options).format(now);
 
   displayMovement(acc)
   displaySummary(acc)
@@ -240,9 +277,12 @@ btnLoan.addEventListener('click', function(e){
   const amount = Number(inputLoanAmount.value);
   console.log(amount)
   if(amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)){
-    currentAccount.movements.push(amount)
-    currentAccount.movementsDates.push(new Date())
-    updateUI(currentAccount)
+    setTimeout(function(){
+      currentAccount.movements.push(amount)
+      currentAccount.movementsDates.push(new Date())
+      updateUI(currentAccount)
+    },)
+  
   }
   inputLoanAmount.value = '';
 })
@@ -269,5 +309,3 @@ btnSort.addEventListener('click', function(e){
   displayMovement(currentAccount, !sorted);
   sorted = !sorted
 })
-const x = new Date()
-labelDate.textContent = new Intl.DateTimeFormat().format(x)
